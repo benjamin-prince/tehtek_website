@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { ShoppingCart, ArrowLeft, Package, Shield, Star, Loader2, Tag, Weight, Cpu, CheckCircle2, Sparkles, Check, Plus, Minus, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Package, Shield, Star, Loader2, Tag, Weight, Cpu, CheckCircle2, Sparkles, Check, Plus, Minus, ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ShopProduct } from "@/components/ProductCard";
+import ProductCard, { ShopProduct } from "@/components/ProductCard";
 import { addToCart, getCart, cartCount } from "@/lib/cart";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://api2.tehtek.com/api/v1";
@@ -42,6 +42,9 @@ export default function ProductDetailPage() {
   const [cartOpen,   setCartOpen]   = useState(false);
   const [activeImg,  setActiveImg]  = useState(0);
 
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState<ShopProduct[]>([]);
+
   const [cartCount_, setCartCount_] = useState(0);
   const refreshCount = useCallback(() => setCartCount_(cartCount(getCart())), []);
   useEffect(() => {
@@ -50,6 +53,14 @@ export default function ProductDetailPage() {
     return () => window.removeEventListener("cart-updated", refreshCount);
   }, [refreshCount]);
 
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setLightboxOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen]);
 
   useEffect(() => {
     fetch(`${API}/shop/products/${id}`)
@@ -57,7 +68,18 @@ export default function ProductDetailPage() {
         if (!r.ok) throw new Error("not found");
         return r.json();
       })
-      .then(setProduct)
+      .then((p: ShopProduct) => {
+        setProduct(p);
+        // Fetch related products from same category
+        fetch(`${API}/shop/products?category=${encodeURIComponent(p.category)}&per_page=8&page=1`)
+          .then(r => r.json())
+          .then((data: unknown) => {
+            const items: ShopProduct[] = (data as { items?: ShopProduct[] }).items
+              ?? (Array.isArray(data) ? data as ShopProduct[] : []);
+            setRelatedProducts(items.filter(r => r.id !== p.id && r.stock_available > 0).slice(0, 4));
+          })
+          .catch(() => {});
+      })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id]);
@@ -138,13 +160,23 @@ export default function ProductDetailPage() {
                       {/* Main image */}
                       <div className="relative rounded-3xl border border-slate-200 bg-white aspect-square flex items-center justify-center overflow-hidden shadow-sm">
                         {mainSrc ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            key={mainSrc}
-                            src={mainSrc}
-                            alt={product.name_fr ?? product.name}
-                            className="w-full h-full object-contain p-8"
-                          />
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              key={mainSrc}
+                              src={mainSrc}
+                              alt={product.name_fr ?? product.name}
+                              className="w-full h-full object-contain p-8 cursor-zoom-in"
+                              onClick={() => setLightboxOpen(true)}
+                            />
+                            <button
+                              onClick={() => setLightboxOpen(true)}
+                              className="absolute bottom-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white/90 shadow border border-slate-200 hover:bg-white transition-colors"
+                              title="Agrandir"
+                            >
+                              <ZoomIn className="w-4 h-4 text-slate-500" />
+                            </button>
+                          </>
                         ) : (
                           <div className="flex flex-col items-center text-slate-300">
                             <Package className="w-24 h-24 mb-3" />
@@ -388,10 +420,80 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
               )}
+
+              {/* ── Related products ── */}
+              {relatedProducts.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-black text-slate-800 mb-5">Produits similaires</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {relatedProducts.map(p => (
+                      <ProductCard key={p.id} product={p} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </main>
+
+      {/* ── Image lightbox ── */}
+      {lightboxOpen && product && (() => {
+        const allImgs = (product.image_urls && product.image_urls.length > 0)
+          ? product.image_urls
+          : product.image_url ? [product.image_url] : [];
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            onClick={() => setLightboxOpen(false)}
+          >
+            <button
+              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              onClick={() => setLightboxOpen(false)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {allImgs.length > 1 && (
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                onClick={e => { e.stopPropagation(); setActiveImg(i => (i - 1 + allImgs.length) % allImgs.length); }}
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={allImgs[activeImg]}
+              alt={product.name_fr ?? product.name}
+              className="max-w-[90vw] max-h-[90vh] object-contain"
+              onClick={e => e.stopPropagation()}
+            />
+
+            {allImgs.length > 1 && (
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                onClick={e => { e.stopPropagation(); setActiveImg(i => (i + 1) % allImgs.length); }}
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+
+            {allImgs.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {allImgs.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={e => { e.stopPropagation(); setActiveImg(i); }}
+                    className={`w-2 h-2 rounded-full transition-colors ${i === activeImg ? "bg-white" : "bg-white/40"}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Sticky mobile bottom CTA bar */}
       {product && !loading && (

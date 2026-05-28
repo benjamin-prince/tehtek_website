@@ -7,13 +7,14 @@ const LINKS = {
     { label: "Informatique", href: "/produits?cat=it_equipment" },
     { label: "Solaire & Énergie", href: "/produits?cat=solar_equipment" },
     { label: "Sécurité", href: "/produits?cat=security_equipment" },
-    { label: "Réseau & Wi-Fi", href: "/produits?cat=network_equipment" },
-    { label: "Accessoires", href: "/produits?cat=accessories" },
+    { label: "Produits d'occasion", href: "/occasion" },
+    { label: "Mes favoris", href: "/wishlist" },
   ],
   company: [
     { label: "À propos", href: "/a-propos" },
     { label: "Cargo & Expédition", href: "/cargo" },
     { label: "Infrastructures", href: "/services" },
+    { label: "FAQ", href: "/faq" },
     { label: "Contact", href: "/contact" },
   ],
 };

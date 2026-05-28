@@ -2,8 +2,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Phone, Search, ShoppingCart, UserCircle2, LogOut, Package, User } from "lucide-react";
+import { Menu, X, Phone, Search, ShoppingCart, UserCircle2, LogOut, Package, User, Heart } from "lucide-react";
 import { getCart, cartCount } from "@/lib/cart";
+import { wishlistCount } from "@/lib/wishlist";
 import { getProfile, isLoggedIn, logoutCustomer } from "@/lib/shopAuth";
 import CartDrawer from "./CartDrawer";
 
@@ -16,13 +17,14 @@ interface NavbarProps {
 }
 
 export default function Navbar({ hideSearch }: NavbarProps) {
-  const [open,        setOpen]        = useState(false);
-  const [cartOpen,    setCartOpen]    = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
-  const [count,       setCount]       = useState(0);
-  const [navCats,     setNavCats]     = useState<NavCat[]>([]);
-  const [loggedIn,    setLoggedIn]    = useState(false);
-  const [firstName,   setFirstName]   = useState("");
+  const [open,          setOpen]          = useState(false);
+  const [cartOpen,      setCartOpen]      = useState(false);
+  const [accountOpen,   setAccountOpen]   = useState(false);
+  const [count,         setCount]         = useState(0);
+  const [wishCount,     setWishCount]     = useState(0);
+  const [navCats,       setNavCats]       = useState<NavCat[]>([]);
+  const [loggedIn,      setLoggedIn]      = useState(false);
+  const [firstName,     setFirstName]     = useState("");
   const accountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function Navbar({ hideSearch }: NavbarProps) {
   }, []);
 
   const refreshCount = useCallback(() => setCount(cartCount(getCart())), []);
+  const refreshWish  = useCallback(() => setWishCount(wishlistCount()), []);
   const refreshAuth  = useCallback(() => {
     const profile = getProfile();
     setLoggedIn(isLoggedIn());
@@ -41,17 +44,20 @@ export default function Navbar({ hideSearch }: NavbarProps) {
 
   useEffect(() => {
     refreshCount();
+    refreshWish();
     refreshAuth();
     const openCart = () => setCartOpen(true);
     window.addEventListener("cart-updated",      refreshCount);
+    window.addEventListener("wishlist-updated",  refreshWish);
     window.addEventListener("shop-auth-changed", refreshAuth);
     window.addEventListener("open-cart",         openCart);
     return () => {
       window.removeEventListener("cart-updated",      refreshCount);
+      window.removeEventListener("wishlist-updated",  refreshWish);
       window.removeEventListener("shop-auth-changed", refreshAuth);
       window.removeEventListener("open-cart",         openCart);
     };
-  }, [refreshCount, refreshAuth]);
+  }, [refreshCount, refreshWish, refreshAuth]);
 
   // Close account dropdown on outside click
   useEffect(() => {
@@ -161,6 +167,20 @@ export default function Navbar({ hideSearch }: NavbarProps) {
                   </div>
                 )}
               </div>
+
+              {/* Wishlist button */}
+              <Link
+                href="/wishlist"
+                className="relative hidden sm:flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 hover:border-red-400 hover:bg-red-50 text-slate-500 hover:text-red-500 transition-colors"
+                title="Mes favoris"
+              >
+                <Heart className="w-4 h-4" />
+                {wishCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center">
+                    {wishCount > 9 ? "9+" : wishCount}
+                  </span>
+                )}
+              </Link>
 
               {/* Cart button */}
               <button
