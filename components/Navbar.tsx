@@ -90,9 +90,9 @@ export default function Navbar({ hideSearch }: NavbarProps) {
               <Image src="/logo.png" alt="TEHTEK" width={140} height={20} priority style={{ height: "auto" }} />
             </Link>
 
-            {/* Search bar (desktop) */}
+            {/* Search bar */}
             {!hideSearch && (
-              <div className="flex-1 hidden sm:flex items-center max-w-xl relative">
+              <div className="flex-1 flex items-center max-w-xl relative">
                 <input
                   type="text"
                   placeholder="Rechercher un produit, une marque…"
@@ -224,20 +224,6 @@ export default function Navbar({ hideSearch }: NavbarProps) {
         {/* Mobile menu */}
         {open && (
           <div className="sm:hidden bg-white border-t border-slate-100 px-4 py-3 space-y-1">
-            <div className="relative mb-3">
-              <input
-                type="text"
-                placeholder="Rechercher…"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const v = (e.target as HTMLInputElement).value.trim();
-                    if (v) window.location.href = `/produits?q=${encodeURIComponent(v)}`;
-                  }
-                }}
-                className="w-full border border-slate-300 rounded-full pl-4 pr-10 py-2 text-sm focus:outline-none focus:border-[#2E8B2E]"
-              />
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            </div>
             <Link href="/produits"
               className="block text-sm font-semibold text-[#2E8B2E] py-2 border-b border-slate-50"
               onClick={() => setOpen(false)}>
