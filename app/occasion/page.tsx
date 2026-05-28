@@ -80,7 +80,7 @@ export default function OccasionPage() {
           {!loading && filtered.length > 0 && (
             <>
               <p className="text-sm text-slate-500 mb-4">{filtered.length} produit{filtered.length > 1 ? "s" : ""}</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {filtered.map(p => (
                   <ProductCard key={p.id} product={p} />
                 ))}
