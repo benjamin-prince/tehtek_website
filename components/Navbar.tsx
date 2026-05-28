@@ -84,15 +84,15 @@ export default function Navbar({ hideSearch }: NavbarProps) {
 
         {/* Main bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 gap-4">
+          <div className="flex items-center h-14 sm:h-16 gap-3">
             {/* Logo */}
             <Link href="/" className="shrink-0">
-              <Image src="/logo.png" alt="TEHTEK" width={140} height={20} priority style={{ height: "auto" }} />
+              <Image src="/logo.png" alt="TEHTEK" width={120} height={20} priority style={{ height: "auto" }} className="sm:w-[140px]" />
             </Link>
 
-            {/* Search bar */}
+            {/* Search bar — desktop only (mobile has its own row below) */}
             {!hideSearch && (
-              <div className="flex-1 flex items-center max-w-xl relative">
+              <div className="flex-1 hidden sm:flex items-center max-w-xl relative">
                 <input
                   type="text"
                   placeholder="Rechercher un produit, une marque…"
@@ -109,7 +109,7 @@ export default function Navbar({ hideSearch }: NavbarProps) {
             )}
 
             {/* Right actions */}
-            <div className="ml-auto flex items-center gap-3">
+            <div className="ml-auto flex items-center gap-2 sm:gap-3">
               <a href="tel:+237690768890"
                 className="hidden md:flex items-center gap-1.5 text-sm text-slate-600 hover:text-[#2E8B2E] transition-colors">
                 <Phone className="w-4 h-4" />
@@ -205,6 +205,24 @@ export default function Navbar({ hideSearch }: NavbarProps) {
               </button>
             </div>
           </div>
+
+          {/* Search bar — mobile only row */}
+          {!hideSearch && (
+            <div className="sm:hidden pb-2 relative">
+              <input
+                type="text"
+                placeholder="Rechercher un produit, une marque…"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const v = (e.target as HTMLInputElement).value.trim();
+                    if (v) window.location.href = `/produits?q=${encodeURIComponent(v)}`;
+                  }
+                }}
+                className="w-full border border-slate-300 rounded-full pl-4 pr-10 py-2 text-sm focus:outline-none focus:border-[#2E8B2E] focus:ring-1 focus:ring-[#2E8B2E]"
+              />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            </div>
+          )}
 
           {/* Category nav row (desktop) */}
           <nav className="hidden sm:flex items-center gap-1 border-t border-slate-100 py-1.5 overflow-x-auto scrollbar-hide">
