@@ -105,7 +105,7 @@ export default function FlashBanner() {
         background: `radial-gradient(ellipse at 70% 50%, rgba(${theme.glow},0.2) 0%, transparent 65%)`
       }} />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-5">
         <div className="flex items-center gap-3 sm:gap-6" style={{ opacity: visible ? 1 : 0, transition: "opacity .28s ease" }}>
 
           {/* ── Left: info ── */}
@@ -166,7 +166,7 @@ export default function FlashBanner() {
 
           {/* ── Right: big image ── */}
           <div className="shrink-0 flex items-center justify-center"
-            style={{ width: "clamp(120px,32vw,240px)", height: "clamp(120px,32vw,240px)" }}>
+            style={{ width: "clamp(160px,45vw,320px)", height: "clamp(160px,45vw,320px)" }}>
             <div className="relative w-full h-full flex items-center justify-center">
               <div className="absolute inset-0 rounded-full blur-3xl opacity-40"
                 style={{ background: `radial-gradient(circle, rgba(${theme.glow},0.6) 0%, transparent 70%)` }} />
