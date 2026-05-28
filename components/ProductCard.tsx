@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Package, ShoppingCart, Check } from "lucide-react";
+import { Package, ShoppingCart, Check, Heart } from "lucide-react";
 import { addToCart } from "@/lib/cart";
+import { toggleWishlist, isInWishlist } from "@/lib/wishlist";
 
 export interface ShopProduct {
   id: number;
@@ -33,7 +34,10 @@ function fmt(n: number) {
 }
 
 export default function ProductCard({ product }: { product: ShopProduct }) {
-  const [added, setAdded] = useState(false);
+  const [added,  setAdded]  = useState(false);
+  const [wished, setWished] = useState(false);
+
+  useEffect(() => { setWished(isInWishlist(product.id)); }, [product.id]);
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -50,12 +54,24 @@ export default function ProductCard({ product }: { product: ShopProduct }) {
     setTimeout(() => setAdded(false), 1500);
   }
 
+  function handleWishlist(e: React.MouseEvent) {
+    e.preventDefault();
+    const result = toggleWishlist({
+      id: product.id, sku: product.sku,
+      name: product.name_fr ?? product.name,
+      image_url: product.image_url,
+      sell_price: product.sell_price,
+      compare_price: product.compare_price,
+      brand: product.brand,
+      category: product.category,
+    });
+    setWished(result);
+  }
+
   const discountPct =
     product.compare_price && product.sell_price && product.compare_price > product.sell_price
       ? Math.round(((product.compare_price - product.sell_price) / product.compare_price) * 100)
       : null;
-
-  const waLink = `https://wa.me/237690768890?text=Bonjour%20TEHTEK%2C%20je%20voudrais%20commander%20%3A%20${encodeURIComponent(product.name)}%20(${product.sku})`;
 
   return (
     <div className="group bg-white rounded-2xl border border-slate-200 hover:border-[#2E8B2E] hover:shadow-md transition-all overflow-hidden flex flex-col">
@@ -74,7 +90,7 @@ export default function ProductCard({ product }: { product: ShopProduct }) {
           </div>
         )}
 
-        {/* Badges */}
+        {/* Badges top-left */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {discountPct && (
             <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-md">
@@ -87,6 +103,15 @@ export default function ProductCard({ product }: { product: ShopProduct }) {
             </span>
           )}
         </div>
+
+        {/* Wishlist button top-right */}
+        <button
+          onClick={handleWishlist}
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 shadow border border-slate-200 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:scale-110 transition-all"
+          title={wished ? "Retirer des favoris" : "Ajouter aux favoris"}
+        >
+          <Heart className={`w-4 h-4 transition-colors ${wished ? "fill-red-500 text-red-500" : "text-slate-400"}`} />
+        </button>
 
         {/* Out of stock overlay */}
         {product.stock_available === 0 && (
