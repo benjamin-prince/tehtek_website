@@ -168,6 +168,18 @@ export default function Navbar({ hideSearch }: NavbarProps) {
                 )}
               </div>
 
+              {/* User icon — mobile only */}
+              <Link
+                href={loggedIn ? "/compte" : "/connexion"}
+                className="relative sm:hidden flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 hover:border-[#2E8B2E] hover:bg-green-50 text-slate-500 hover:text-[#2E8B2E] transition-colors"
+                title={loggedIn ? "Mon compte" : "Connexion"}
+              >
+                <UserCircle2 className="w-5 h-5" />
+                {loggedIn && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#2E8B2E] rounded-full border-2 border-white" />
+                )}
+              </Link>
+
               {/* Wishlist button */}
               <Link
                 href="/wishlist"
