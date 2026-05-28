@@ -51,8 +51,8 @@ export default function FlashBanner() {
           ?? (Array.isArray(data) ? data as ShopProduct[] : []);
         setProducts(
           items
-            .filter(p => p.sell_price && p.compare_price && p.compare_price > p.sell_price && p.image_url && p.stock_available > 0)
-            .sort((a, b) => ((b.compare_price! - b.sell_price!) / b.compare_price!) - ((a.compare_price! - a.sell_price!) / a.compare_price!))
+            .filter(p => p.image_url && p.sell_price && p.stock_available > 0)
+            .sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0))
             .slice(0, 5)
         );
       })
