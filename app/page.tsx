@@ -2,6 +2,7 @@ import Hero from "@/components/Hero";
 import Categories from "@/components/Categories";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import FlashDeals from "@/components/FlashDeals";
+import FlashBanner from "@/components/FlashBanner";
 import BrandsSection from "@/components/BrandsSection";
 import Services from "@/components/Services";
 import WhatsAppCTA from "@/components/WhatsAppCTA";
@@ -12,6 +13,7 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
+      <FlashBanner />
       <main>
         <FeaturedProducts />
         <FlashDeals />
