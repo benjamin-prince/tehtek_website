@@ -138,116 +138,106 @@ export default function FlashBanner() {
         }
       `}</style>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-8 py-4 sm:py-8">
-        <div className="flex items-center gap-3 sm:gap-8">
+      {/* Full-bleed image background */}
+      <div className="relative" style={{ opacity: visible ? 1 : 0, transition: "opacity .4s ease" }}>
+        {p.image_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={`img-${idx}`}
+            src={p.image_url}
+            alt={p.name_fr ?? p.name}
+            className="flash-img absolute right-0 top-0 h-full object-contain drop-shadow-2xl pointer-events-none"
+            style={{ maxWidth: "55%", bottom: 0 }}
+          />
+        )}
 
-          {/* ── Left content ── */}
-          <div className="flex-1 min-w-0" style={{ opacity: visible ? 1 : 0, transition: "opacity .35s ease" }}>
-            <div className="flash-content" key={`content-${idx}`}>
+        {/* Gradient overlay so text is readable */}
+        <div className="absolute inset-0" style={{
+          background: `linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.05) 100%)`
+        }} />
 
-              {/* Badge row */}
-              <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                <span className="inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-0.5 rounded-full"
-                  style={{ background: theme.accent, color: "#0a0a0a" }}>
-                  <Zap className="w-2.5 h-2.5" /> OFFRE FLASH
+        <div className="relative px-4 sm:px-8 py-4 sm:py-6 max-w-7xl mx-auto">
+          <div className="flash-content max-w-[55%]" key={`content-${idx}`}
+            style={{ opacity: visible ? 1 : 0, transition: "opacity .35s ease" }}>
+
+            {/* Badges */}
+            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full"
+                style={{ background: theme.accent, color: "#0a0a0a" }}>
+                <Zap className="w-2.5 h-2.5" /> FLASH
+              </span>
+              {pct && (
+                <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-pulse">
+                  -{pct}%
                 </span>
-                {pct && (
-                  <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-pulse">
-                    -{pct}%
-                  </span>
-                )}
-                {p.brand && (
-                  <span className="text-[10px] font-bold uppercase tracking-widest opacity-60" style={{ color: theme.accent }}>
-                    {p.brand}
-                  </span>
-                )}
-              </div>
-
-              {/* Name */}
-              <h2 className="text-white font-black leading-tight mb-1.5 line-clamp-2"
-                style={{ fontSize: "clamp(1rem, 3.5vw, 1.8rem)" }}>
-                {p.name_fr ?? p.name}
-              </h2>
-
-              {/* Price */}
-              <div className="flex flex-wrap items-baseline gap-2 mb-2.5">
-                <span className="font-black" style={{ fontSize: "clamp(1.25rem, 4vw, 2.2rem)", color: theme.accent }}>
-                  {fmt(p.sell_price!)}
-                </span>
-                {p.compare_price && p.compare_price > p.sell_price! && (
-                  <span className="text-white/35 line-through text-sm">
-                    {fmt(p.compare_price)}
-                  </span>
-                )}
-              </div>
-
-              {/* Countdown */}
-              <div className="flex items-center gap-1.5 mb-3">
-                <span className="text-white/50 text-[10px] font-semibold">Expire dans</span>
-                {[pad(time.h), pad(time.m), pad(time.s)].map((v, i) => (
-                  <span key={i} className="flex items-center gap-1">
-                    <span className="font-mono font-black text-xs rounded px-1.5 py-0.5"
-                      style={{ background: `${theme.accent}22`, color: theme.accent, border: `1px solid ${theme.accent}44` }}>
-                      {v}
-                    </span>
-                    {i < 2 && <span className="text-white/30 text-[10px] font-bold">:</span>}
-                  </span>
-                ))}
-              </div>
-
-              {/* CTA */}
-              <div className="flex items-center gap-3">
-                <Link
-                  href={`/produits/${p.id}`}
-                  className="shimmer-btn relative overflow-hidden inline-flex items-center gap-1.5 font-black text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2.5 rounded-full transition-transform hover:scale-105 active:scale-95"
-                  style={{ background: `linear-gradient(135deg,${theme.accent},${theme.accent}bb)`, color: "#0a0a0a" }}
-                >
-                  <Zap className="w-3 h-3" />
-                  Commander
-                </Link>
-                <Link href="/produits?sort=discount"
-                  className="text-white/40 hover:text-white text-xs font-semibold transition-colors hidden sm:inline">
-                  Tout voir →
-                </Link>
-              </div>
+              )}
             </div>
-          </div>
 
-          {/* ── Right: product image ── */}
-          <div className="shrink-0 relative flex items-center justify-center"
-            style={{ width: "clamp(110px,28vw,220px)", height: "clamp(110px,28vw,220px)",
-              opacity: visible ? 1 : 0, transition: "opacity .35s ease" }}>
-            <div className="absolute inset-0 rounded-full blur-2xl scale-75"
-              style={{ background: `radial-gradient(circle, ${theme.glow} 0%, transparent 70%)` }} />
-            {p.image_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={`img-${idx}`}
-                src={p.image_url}
-                alt={p.name_fr ?? p.name}
-                className="flash-img relative w-full h-full object-contain drop-shadow-2xl"
-              />
+            {/* Brand */}
+            {p.brand && (
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70" style={{ color: theme.accent }}>
+                {p.brand}
+              </p>
             )}
-          </div>
-        </div>
 
-        {/* ── Dots + counter ── */}
-        <div className="flex items-center gap-2 mt-3">
-          <div className="flex gap-1.5">
-            {products.map((_, i) => (
-              <button key={i} onClick={() => goTo(i)}
-                className="relative h-1 rounded-full overflow-hidden transition-all duration-300"
-                style={{ width: i === idx ? "28px" : "8px", background: "rgba(255,255,255,0.2)" }}>
-                {i === idx && (
-                  <div className="absolute inset-0 rounded-full origin-left"
-                    style={{ background: theme.accent, transform: `scaleX(${progress / 100})`, transition: "transform 50ms linear" }} />
-                )}
-              </button>
-            ))}
+            {/* Name */}
+            <h2 className="text-white font-black leading-tight mb-2 line-clamp-2"
+              style={{ fontSize: "clamp(.85rem, 3vw, 1.5rem)" }}>
+              {p.name_fr ?? p.name}
+            </h2>
+
+            {/* Price */}
+            <div className="flex flex-wrap items-baseline gap-2 mb-2">
+              <span className="font-black" style={{ fontSize: "clamp(1.1rem, 3.5vw, 2rem)", color: theme.accent }}>
+                {fmt(p.sell_price!)}
+              </span>
+              {p.compare_price && p.compare_price > p.sell_price! && (
+                <span className="text-white/40 line-through text-xs">{fmt(p.compare_price)}</span>
+              )}
+            </div>
+
+            {/* Countdown */}
+            <div className="flex items-center gap-1 mb-3">
+              <span className="text-white/50 text-[10px]">Expire dans</span>
+              {[pad(time.h), pad(time.m), pad(time.s)].map((v, i) => (
+                <span key={i} className="flex items-center gap-0.5">
+                  <span className="font-mono font-black text-[11px] rounded px-1.5 py-0.5"
+                    style={{ background: `${theme.accent}25`, color: theme.accent, border: `1px solid ${theme.accent}40` }}>
+                    {v}
+                  </span>
+                  {i < 2 && <span className="text-white/30 text-[10px]">:</span>}
+                </span>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <Link
+              href={`/produits/${p.id}`}
+              className="shimmer-btn relative overflow-hidden inline-flex items-center gap-1.5 font-black text-xs px-4 py-2 rounded-full transition-transform hover:scale-105 active:scale-95"
+              style={{ background: `linear-gradient(135deg,${theme.accent},${theme.accent}cc)`, color: "#0a0a0a" }}
+            >
+              <Zap className="w-3 h-3" /> Commander
+            </Link>
           </div>
-          <span className="ml-auto text-white/25 text-[10px] font-mono">
-            {String(idx + 1).padStart(2, "0")}/{String(products.length).padStart(2, "0")}
-          </span>
+
+          {/* Dots */}
+          <div className="flex items-center gap-2 mt-3">
+            <div className="flex gap-1.5">
+              {products.map((_, i) => (
+                <button key={i} onClick={() => goTo(i)}
+                  className="relative h-1 rounded-full overflow-hidden transition-all duration-300"
+                  style={{ width: i === idx ? "24px" : "7px", background: "rgba(255,255,255,0.2)" }}>
+                  {i === idx && (
+                    <div className="absolute inset-0 rounded-full origin-left"
+                      style={{ background: theme.accent, transform: `scaleX(${progress / 100})`, transition: "transform 50ms linear" }} />
+                  )}
+                </button>
+              ))}
+            </div>
+            <span className="ml-auto text-white/25 text-[10px] font-mono">
+              {idx + 1}/{products.length}
+            </span>
+          </div>
         </div>
       </div>
     </div>
