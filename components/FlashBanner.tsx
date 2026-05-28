@@ -1,49 +1,23 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Timer, ChevronLeft, ChevronRight } from "lucide-react";
+import { Timer, ChevronLeft, ChevronRight, Zap } from "lucide-react";
+import { ShopProduct } from "./ProductCard";
 
-const SLIDES = [
-  {
-    tag: "Offre Flash",
-    title: "iPhone 15 Pro Max",
-    subtitle: "128 Go · Titanium Black · Neuf",
-    price: "950 000 XAF",
-    oldPrice: "1 150 000 XAF",
-    discount: "-17%",
-    cta: "Commander",
-    href: "/produits?q=iphone+15",
-    bg: "from-[#1A2E1A] to-[#2E8B2E]",
-    accent: "#F5C800",
-    img: null,
-  },
-  {
-    tag: "Promo Semaine",
-    title: "Samsung Galaxy S24",
-    subtitle: "256 Go · Phantom Black · Neuf",
-    price: "680 000 XAF",
-    oldPrice: "820 000 XAF",
-    discount: "-17%",
-    cta: "Voir l'offre",
-    href: "/produits?q=samsung+s24",
-    bg: "from-[#1a1a2e] to-[#16213e]",
-    accent: "#00b4d8",
-    img: null,
-  },
-  {
-    tag: "Stock Limité",
-    title: "MacBook Air M2",
-    subtitle: "8 Go RAM · 256 Go SSD · Space Grey",
-    price: "820 000 XAF",
-    oldPrice: "980 000 XAF",
-    discount: "-16%",
-    cta: "Réserver",
-    href: "/produits?q=macbook+air",
-    bg: "from-[#2d1b69] to-[#11998e]",
-    accent: "#F5C800",
-    img: null,
-  },
+const API = process.env.NEXT_PUBLIC_API_URL ?? "https://api2.tehtek.com/api/v1";
+
+const THEMES = [
+  { bg: "from-[#0f2027] via-[#1A2E1A] to-[#2E8B2E]", accent: "#F5C800" },
+  { bg: "from-[#1a1a2e] via-[#16213e] to-[#0f3460]",  accent: "#00b4d8" },
+  { bg: "from-[#4a0000] via-[#7b0000] to-[#c0392b]",  accent: "#F5C800" },
+  { bg: "from-[#1a0533] via-[#2d1b69] to-[#553c9a]",  accent: "#f9a8d4" },
 ];
+
+function fmt(n: number) {
+  return new Intl.NumberFormat("fr-CM", { style: "currency", currency: "XAF", maximumFractionDigits: 0 }).format(n);
+}
+
+function pad(n: number) { return String(n).padStart(2, "0"); }
 
 function useCountdown() {
   const [time, setTime] = useState({ h: 5, m: 59, s: 42 });
@@ -63,91 +37,172 @@ function useCountdown() {
   return time;
 }
 
-function pad(n: number) { return String(n).padStart(2, "0"); }
-
 export default function FlashBanner() {
-  const [idx, setIdx] = useState(0);
-  const time = useCountdown();
-  const slide = SLIDES[idx];
+  const [products, setProducts] = useState<ShopProduct[]>([]);
+  const [idx, setIdx]           = useState(0);
+  const time                    = useCountdown();
 
   useEffect(() => {
-    const t = setInterval(() => setIdx(i => (i + 1) % SLIDES.length), 5000);
-    return () => clearInterval(t);
+    fetch(`${API}/shop/products?per_page=60&page=1`)
+      .then(r => r.json())
+      .then((data: unknown) => {
+        const items: ShopProduct[] = (data as { items?: ShopProduct[] }).items
+          ?? (Array.isArray(data) ? data as ShopProduct[] : []);
+        const featured = items
+          .filter(p => p.sell_price && p.compare_price && p.compare_price > p.sell_price && p.image_url && p.stock_available > 0)
+          .sort((a, b) => {
+            const pA = ((a.compare_price! - a.sell_price!) / a.compare_price!) * 100;
+            const pB = ((b.compare_price! - b.sell_price!) / b.compare_price!) * 100;
+            return pB - pA;
+          })
+          .slice(0, 4);
+        setProducts(featured);
+      })
+      .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (products.length < 2) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % products.length), 6000);
+    return () => clearInterval(t);
+  }, [products.length]);
+
+  if (products.length === 0) return null;
+
+  const p     = products[idx];
+  const theme = THEMES[idx % THEMES.length];
+  const pct   = p.compare_price && p.sell_price
+    ? Math.round(((p.compare_price - p.sell_price) / p.compare_price) * 100)
+    : null;
+
   return (
-    <div className={`relative w-full bg-gradient-to-r ${slide.bg} transition-all duration-700 overflow-hidden`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-        <div className="flex items-center justify-between gap-4">
+    <div className={`relative w-full bg-gradient-to-br ${theme.bg} overflow-hidden`} style={{ minHeight: "220px" }}>
 
-          {/* Left: tag + title */}
-          <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-            <span className="shrink-0 text-xs font-black px-2.5 py-1 rounded-full border"
-              style={{ color: slide.accent, borderColor: slide.accent, backgroundColor: `${slide.accent}18` }}>
-              {slide.tag}
-            </span>
-            <div className="min-w-0">
-              <p className="text-white font-black text-base sm:text-lg leading-tight truncate">{slide.title}</p>
-              <p className="text-white/60 text-xs truncate">{slide.subtitle}</p>
-            </div>
-          </div>
+      {/* Decorative circles */}
+      <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full opacity-10 bg-white" />
+      <div className="absolute -left-8 -bottom-8 w-40 h-40 rounded-full opacity-10 bg-white" />
 
-          {/* Center: price + countdown */}
-          <div className="hidden sm:flex flex-col items-center shrink-0">
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-white font-black text-xl">{slide.price}</span>
-              <span className="text-white/40 text-sm line-through">{slide.oldPrice}</span>
-              <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">{slide.discount}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-white/70 text-xs">
-              <Timer className="w-3.5 h-3.5" style={{ color: slide.accent }} />
-              <span>Expire dans</span>
-              <span className="font-mono font-bold" style={{ color: slide.accent }}>
-                {pad(time.h)}:{pad(time.m)}:{pad(time.s)}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="flex items-center gap-6">
+
+          {/* Left: content */}
+          <div className="flex-1 min-w-0">
+            {/* Tag */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="flex items-center gap-1 text-xs font-black px-3 py-1 rounded-full"
+                style={{ backgroundColor: theme.accent, color: "#1A2E1A" }}>
+                <Zap className="w-3 h-3" /> OFFRE FLASH
               </span>
+              {pct && (
+                <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  -{pct}%
+                </span>
+              )}
+            </div>
+
+            {/* Brand */}
+            {p.brand && (
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: theme.accent }}>
+                {p.brand}
+              </p>
+            )}
+
+            {/* Name */}
+            <h2 className="text-white font-black text-xl sm:text-3xl leading-tight mb-1 line-clamp-2">
+              {p.name_fr ?? p.name}
+            </h2>
+
+            {/* Price */}
+            <div className="flex items-baseline gap-3 mb-4">
+              <span className="text-white font-black text-2xl sm:text-4xl">
+                {fmt(p.sell_price!)}
+              </span>
+              {p.compare_price && p.compare_price > p.sell_price! && (
+                <span className="text-white/40 text-base line-through">
+                  {fmt(p.compare_price)}
+                </span>
+              )}
+            </div>
+
+            {/* Countdown */}
+            <div className="flex items-center gap-2 mb-5">
+              <Timer className="w-4 h-4" style={{ color: theme.accent }} />
+              <span className="text-white/60 text-sm">Expire dans</span>
+              <div className="flex items-center gap-1">
+                {[pad(time.h), pad(time.m), pad(time.s)].map((v, i) => (
+                  <span key={i} className="flex items-center gap-1">
+                    <span className="font-mono font-black text-sm px-2 py-0.5 rounded"
+                      style={{ backgroundColor: "rgba(255,255,255,0.15)", color: theme.accent }}>
+                      {v}
+                    </span>
+                    {i < 2 && <span className="text-white/40 font-bold text-xs">:</span>}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="flex items-center gap-3">
+              <Link
+                href={`/produits/${p.id}`}
+                className="font-black text-sm px-6 py-2.5 rounded-full transition-opacity hover:opacity-90 whitespace-nowrap"
+                style={{ backgroundColor: theme.accent, color: "#1A2E1A" }}
+              >
+                Commander maintenant
+              </Link>
+              <Link href="/produits?sort=discount"
+                className="text-white/60 hover:text-white text-sm transition-colors">
+                Voir tout →
+              </Link>
             </div>
           </div>
 
-          {/* Right: CTA + nav */}
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href={slide.href}
-              className="text-sm font-bold px-4 py-2 rounded-full transition-colors whitespace-nowrap"
-              style={{ backgroundColor: slide.accent, color: "#1A2E1A" }}
-            >
-              {slide.cta}
+          {/* Right: product image */}
+          {p.image_url && (
+            <Link href={`/produits/${p.id}`}
+              className="shrink-0 w-36 h-36 sm:w-56 sm:h-56 lg:w-64 lg:h-64 relative flex items-center justify-center">
+              {/* Glow */}
+              <div className="absolute inset-0 rounded-full blur-3xl opacity-30 scale-75"
+                style={{ backgroundColor: theme.accent }} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.image_url}
+                alt={p.name_fr ?? p.name}
+                className="relative w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+              />
             </Link>
-            <div className="flex gap-1">
-              <button
-                onClick={() => setIdx(i => (i - 1 + SLIDES.length) % SLIDES.length)}
-                className="w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setIdx(i => (i + 1) % SLIDES.length)}
-                className="w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
+          )}
         </div>
 
-        {/* Dot indicators */}
-        <div className="flex justify-center gap-1.5 mt-3">
-          {SLIDES.map((_, i) => (
+        {/* Dots + slide count */}
+        <div className="flex items-center gap-3 mt-4">
+          <div className="flex gap-1.5">
+            {products.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                className="h-1.5 rounded-full transition-all duration-300"
+                style={{
+                  width: i === idx ? "24px" : "8px",
+                  backgroundColor: i === idx ? theme.accent : "rgba(255,255,255,0.3)"
+                }}
+              />
+            ))}
+          </div>
+          <div className="ml-auto flex gap-1.5">
             <button
-              key={i}
-              onClick={() => setIdx(i)}
-              className="h-1 rounded-full transition-all"
-              style={{
-                width: i === idx ? "20px" : "6px",
-                backgroundColor: i === idx ? slide.accent : "rgba(255,255,255,0.3)"
-              }}
-            />
-          ))}
+              onClick={() => setIdx(i => (i - 1 + products.length) % products.length)}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setIdx(i => (i + 1) % products.length)}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
