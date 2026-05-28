@@ -36,9 +36,9 @@ export default function Footer() {
               certifiés, garantie officielle, service après-vente local.
             </p>
             <div className="space-y-2 text-sm text-green-200/70">
-              <a href="tel:+237690000000" className="flex items-center gap-2 hover:text-white transition-colors">
+              <a href="tel:+237690768890" className="flex items-center gap-2 hover:text-white transition-colors">
                 <Phone className="w-4 h-4 text-[#F5C800]" />
-                +237 690 000 000
+                +237 690 76 88 90
               </a>
               <a href="mailto:info@tehtek.com" className="flex items-center gap-2 hover:text-white transition-colors">
                 <Mail className="w-4 h-4 text-[#F5C800]" />
@@ -87,7 +87,7 @@ export default function Footer() {
               Réponse garantie sous 15 minutes en heures ouvrables.
             </p>
             <a
-              href="https://wa.me/237690000000?text=Bonjour%20TEHTEK%2C%20je%20voudrais%20passer%20une%20commande"
+              href="https://wa.me/237690768890?text=Bonjour%20TEHTEK%2C%20je%20voudrais%20passer%20une%20commande"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#2E8B2E] hover:bg-[#236B23] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"

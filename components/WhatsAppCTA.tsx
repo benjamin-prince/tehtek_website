@@ -19,7 +19,7 @@ export default function WhatsAppCTA() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
-            href="https://wa.me/237690000000?text=Bonjour%20TEHTEK%2C%20je%20voudrais%20commander"
+            href="https://wa.me/237690768890?text=Bonjour%20TEHTEK%2C%20je%20voudrais%20commander"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-[#F5C800] text-[#1A2E1A] font-bold px-8 py-4 rounded-full hover:bg-[#FFD700] transition-all shadow-lg text-base"
@@ -30,7 +30,7 @@ export default function WhatsAppCTA() {
             Démarrer sur WhatsApp
           </a>
           <a
-            href="tel:+237690000000"
+            href="tel:+237690768890"
             className="inline-flex items-center gap-2 text-white/70 hover:text-white font-medium transition-colors"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
