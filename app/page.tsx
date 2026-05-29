@@ -1,27 +1,31 @@
-import Hero from "@/components/Hero";
-import Categories from "@/components/Categories";
-import FeaturedProducts from "@/components/FeaturedProducts";
-import FlashDeals from "@/components/FlashDeals";
 import FlashBanner from "@/components/FlashBanner";
-import BrandsSection from "@/components/BrandsSection";
-import Services from "@/components/Services";
-import WhatsAppCTA from "@/components/WhatsAppCTA";
+import FeaturedList from "@/components/FeaturedList";
+import FlashDeals from "@/components/FlashDeals";
+import CategoryRow from "@/components/CategoryRow";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+const CATEGORIES = [
+  { catKey: "electronics",        label: "Téléphones & Tablettes", emoji: "📱" },
+  { catKey: "it_equipment",       label: "Informatique",           emoji: "💻" },
+  { catKey: "printer",            label: "Imprimantes",            emoji: "🖨️" },
+  { catKey: "solar_equipment",    label: "Solaire & Énergie",      emoji: "☀️" },
+  { catKey: "security_equipment", label: "Sécurité",               emoji: "🔒" },
+  { catKey: "network_equipment",  label: "Réseau",                 emoji: "📡" },
+  { catKey: "accessories",        label: "Accessoires",            emoji: "🎧" },
+  { catKey: "tv_av",              label: "TV & Audio",             emoji: "📺" },
+  { catKey: "storage",            label: "Stockage",               emoji: "💾" },
+];
 
 export default function HomePage() {
   return (
     <>
       <Navbar />
       <FlashBanner />
-      <main>
-        <FeaturedProducts />
+      <main className="bg-slate-50">
+        <FeaturedList />
         <FlashDeals />
-        <Hero />
-        <Categories />
-        <BrandsSection />
-        <Services />
-        <WhatsAppCTA />
+        {CATEGORIES.map(c => <CategoryRow key={c.catKey} {...c} />)}
       </main>
       <Footer />
     </>

@@ -122,9 +122,13 @@ export default function FlashBanner() {
           background: `linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.1) 100%)`
         }} />
 
-        {/* Price — top overlay */}
+        {/* Price + name — top overlay */}
         <div className="absolute top-0 left-0 right-0 z-10 px-3 pt-3">
           <div className="fb-text" key={`t${idx}`}>
+            <p className="text-white font-bold drop-shadow-lg leading-tight mb-1"
+              style={{ fontSize: "clamp(0.8rem,3.5vw,1.1rem)" }}>
+              {p.name}
+            </p>
             <div className="flex flex-wrap items-baseline gap-2">
               <span className="font-black drop-shadow-lg" style={{ fontSize: "clamp(1.2rem,5vw,2rem)", color: theme.accent }}>
                 {fmt(p.sell_price!)}
