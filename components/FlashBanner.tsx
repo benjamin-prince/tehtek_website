@@ -157,14 +157,8 @@ export default function FlashBanner() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href={`/produits/${p.id}`}
-              className="fb-btn relative overflow-hidden inline-flex items-center gap-1.5 font-black text-xs px-4 py-1.5 rounded-full transition-transform hover:scale-105 active:scale-95"
-              style={{ background: `linear-gradient(135deg,${theme.accent},${theme.accent}cc)`, color: "#080808" }}>
-              <Zap className="w-3 h-3" /> Commander
-            </Link>
-
             {/* Dots */}
-            <div className="flex gap-1.5 ml-auto">
+            <div className="flex gap-1.5">
               {products.map((_, i) => (
                 <button key={i} onClick={() => goTo(i)}
                   className="relative h-1 rounded-full overflow-hidden transition-all duration-300"
@@ -176,6 +170,12 @@ export default function FlashBanner() {
                 </button>
               ))}
             </div>
+
+            <Link href={`/produits/${p.id}`}
+              className="fb-btn relative overflow-hidden inline-flex items-center gap-1.5 font-black text-xs px-4 py-1.5 rounded-full transition-transform hover:scale-105 active:scale-95 ml-auto"
+              style={{ background: `linear-gradient(135deg,${theme.accent},${theme.accent}cc)`, color: "#080808" }}>
+              <Zap className="w-3 h-3" /> Commander
+            </Link>
           </div>
         </div>
       </div>
