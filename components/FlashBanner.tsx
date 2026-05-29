@@ -122,71 +122,61 @@ export default function FlashBanner() {
           background: `linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.1) 100%)`
         }} />
 
-        {/* Info overlay at top */}
-        <div className="relative z-10 px-3 pt-3 pb-24 sm:pb-32">
+        {/* Price — top overlay */}
+        <div className="absolute top-0 left-0 right-0 z-10 px-3 pt-3">
           <div className="fb-text" key={`t${idx}`}>
-            <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-              <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full"
-                style={{ background: theme.accent, color: "#080808" }}>
-                <Zap className="w-2.5 h-2.5" /> FLASH
-              </span>
-              {pct && (
-                <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">-{pct}%</span>
-              )}
-              {p.brand && (
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">{p.brand}</span>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-baseline gap-2 mb-1.5">
-              <span className="font-black drop-shadow" style={{ fontSize: "clamp(1.1rem,4vw,1.8rem)", color: theme.accent }}>
+            <div className="flex flex-wrap items-baseline gap-2">
+              <span className="font-black drop-shadow-lg" style={{ fontSize: "clamp(1.2rem,5vw,2rem)", color: theme.accent }}>
                 {fmt(p.sell_price!)}
               </span>
               {p.compare_price && p.compare_price > p.sell_price! && (
-                <span className="text-white/40 line-through text-xs">{fmt(p.compare_price)}</span>
+                <span className="text-white/50 line-through text-xs">{fmt(p.compare_price)}</span>
+              )}
+              {pct && (
+                <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">-{pct}%</span>
               )}
             </div>
+          </div>
+        </div>
 
-            <div className="flex items-center gap-1 mb-2">
-              <Timer className="w-3 h-3" style={{ color: theme.accent, opacity: 0.7 }} />
-              <span className="text-white/40 text-[10px]">Expire dans</span>
-              {[pad(time.h), pad(time.m), pad(time.s)].map((v, i) => (
-                <span key={i} className="flex items-center gap-0.5">
-                  <span className="font-mono font-black text-[11px] px-1.5 py-0.5 rounded"
-                    style={{ background: "rgba(0,0,0,0.4)", color: theme.accent, border: `1px solid rgba(${theme.glow},0.35)` }}>
-                    {v}
-                  </span>
-                  {i < 2 && <span className="text-white/25 text-[10px]">:</span>}
+        {/* Bottom overlay — countdown + CTA + dots */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-3 pb-2"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)" }}>
+          <div className="fb-text flex items-center gap-2 mb-1.5" key={`b${idx}`}>
+            <Timer className="w-3 h-3 shrink-0" style={{ color: theme.accent, opacity: 0.7 }} />
+            <span className="text-white/40 text-[10px]">Expire dans</span>
+            {[pad(time.h), pad(time.m), pad(time.s)].map((v, i) => (
+              <span key={i} className="flex items-center gap-0.5">
+                <span className="font-mono font-black text-[11px] px-1.5 py-0.5 rounded"
+                  style={{ background: "rgba(0,0,0,0.5)", color: theme.accent, border: `1px solid rgba(${theme.glow},0.35)` }}>
+                  {v}
                 </span>
-              ))}
-            </div>
+                {i < 2 && <span className="text-white/25 text-[10px]">:</span>}
+              </span>
+            ))}
+          </div>
 
+          <div className="flex items-center gap-3">
             <Link href={`/produits/${p.id}`}
               className="fb-btn relative overflow-hidden inline-flex items-center gap-1.5 font-black text-xs px-4 py-1.5 rounded-full transition-transform hover:scale-105 active:scale-95"
               style={{ background: `linear-gradient(135deg,${theme.accent},${theme.accent}cc)`, color: "#080808" }}>
               <Zap className="w-3 h-3" /> Commander
             </Link>
-          </div>
-        </div>
 
-        {/* Dots at bottom */}
-        <div className="absolute bottom-2 left-0 right-0 z-10 flex items-center justify-center gap-1.5 px-3">
-          <div className="flex gap-1.5">
-            {products.map((_, i) => (
-              <button key={i} onClick={() => goTo(i)}
-                className="relative h-1 rounded-full overflow-hidden transition-all duration-300"
-                style={{ width: i === idx ? "22px" : "7px", background: "rgba(255,255,255,0.25)" }}>
-                {i === idx && (
-                  <div className="absolute inset-0 origin-left rounded-full"
-                    style={{ background: theme.accent, transform: `scaleX(${progress / 100})`, transition: "transform 40ms linear" }} />
-                )}
-              </button>
-            ))}
+            {/* Dots */}
+            <div className="flex gap-1.5 ml-auto">
+              {products.map((_, i) => (
+                <button key={i} onClick={() => goTo(i)}
+                  className="relative h-1 rounded-full overflow-hidden transition-all duration-300"
+                  style={{ width: i === idx ? "20px" : "6px", background: "rgba(255,255,255,0.25)" }}>
+                  {i === idx && (
+                    <div className="absolute inset-0 origin-left rounded-full"
+                      style={{ background: theme.accent, transform: `scaleX(${progress / 100})`, transition: "transform 40ms linear" }} />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
-          <Link href="/produits?sort=discount"
-            className="ml-auto text-white/40 hover:text-white text-[10px] font-semibold transition-colors">
-            Tout voir →
-          </Link>
         </div>
       </div>
     </div>
